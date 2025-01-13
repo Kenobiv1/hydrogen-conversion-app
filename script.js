@@ -1,6 +1,22 @@
 // script.js
 
-document.getElementById('convertBtn').addEventListener('click', function() {
+// Helper function to format numbers to a maximum of two decimal places without trailing zeros
+function formatNumber(num, decimals) {
+    return parseFloat(num.toFixed(decimals));
+}
+
+// Conversion Logic
+document.getElementById('convertBtn').addEventListener('click', performConversion);
+
+// Trigger conversion on Enter key press in the input field
+document.getElementById('inputValue').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        performConversion();
+    }
+});
+
+// Function to perform the conversion
+function performConversion() {
     const inputValue = parseFloat(document.getElementById('inputValue').value);
     const inputUnit = document.getElementById('inputUnit').value;
 
@@ -33,9 +49,43 @@ document.getElementById('convertBtn').addEventListener('click', function() {
     const energyMillionBTU = (massKgHr * energyBTUPerKg) / 1000; // million BTU
     const energyMillionJoules = (massKgHr * energyJoulesPerKg) / 1e6; // million Joules
 
-    // Display results
-    document.getElementById('resultVolume').innerText = `Volume: ${volumeNm3Hr.toFixed(6)} nm³/hr`;
-    document.getElementById('resultGallons').innerText = `Gallons per Day: ${gallonsPerDay.toFixed(2)} gallons/day`;
-    document.getElementById('resultEnergyBTU').innerText = `Energy: ${energyMillionBTU.toFixed(2)} million BTU`;
-    document.getElementById('resultEnergyJoules').innerText = `Energy: ${energyMillionJoules.toFixed(2)} million Joules`;
+    // Display results with formatting
+    document.getElementById('resultVolume').innerText = `Volume: ${formatNumber(volumeNm3Hr, 2)} nm³/hr`;
+    document.getElementById('resultGallons').innerText = `Gallons per Day: ${formatNumber(gallonsPerDay, 2)} gallons/day`;
+    document.getElementById('resultEnergyBTU').innerText = `Energy: ${formatNumber(energyMillionBTU, 2)} million BTU`;
+    document.getElementById('resultEnergyJoules').innerText = `Energy: ${formatNumber(energyMillionJoules, 2)} million Joules`;
+}
+
+// Theme Toggle Logic
+const toggleSwitch = document.getElementById('checkbox');
+const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+
+// Apply saved theme on load
+if (currentTheme) {
+    document.body.classList.add(currentTheme);
+
+    if (currentTheme === 'dark-mode') {
+        toggleSwitch.checked = true;
+    }
+} else {
+    // Detect system preference
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    if (prefersDarkScheme.matches) {
+        document.body.classList.add("dark-mode");
+        toggleSwitch.checked = true;
+        localStorage.setItem("theme", "dark-mode");
+    } else {
+        localStorage.setItem("theme", "light-mode");
+    }
+}
+
+// Listen for toggle changes
+toggleSwitch.addEventListener('change', function(event) {
+    if (event.target.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light-mode');
+    }
 });
